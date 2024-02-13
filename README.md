@@ -1,6 +1,6 @@
 # we_maze
 
-a command to create a 2D maze using worldedit.
+a command to create 2d mazes using worldedit.
 
 you can specify material(s), path width, wall width, algorithm, and a seed.
 
