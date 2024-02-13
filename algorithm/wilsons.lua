@@ -2,7 +2,7 @@ local random = math.random
 
 -- this is used to translate a path index to a schem index
 local function d(i)
-	return 2 * i - 1
+	return 2 * i
 end
 
 local function offset(el, dir)
@@ -20,13 +20,13 @@ end
 -- used to fill in the walls between main path nodes
 local function schem_offset(el, dir)
 	if dir == "u" then
-		return { d(el[1]) - 1, d(el[2]) }
+		return { d(el[1]) - 2, d(el[2]) - 1 }
 	elseif dir == "d" then
-		return { d(el[1]) + 1, d(el[2]) }
-	elseif dir == "l" then
 		return { d(el[1]), d(el[2]) - 1 }
+	elseif dir == "l" then
+		return { d(el[1]) - 1, d(el[2]) - 2 }
 	elseif dir == "r" then
-		return { d(el[1]), d(el[2]) + 1 }
+		return { d(el[1]) - 1, d(el[2]) }
 	end
 end
 
@@ -49,9 +49,9 @@ function we_maze.algorithm.wilsons(width, depth)
 	7###########
 	 12345678901
 	]]
-	for i = 1, d(depth + 1) do
+	for i = 1, d(depth) + 1 do
 		local row = {}
-		for j = 1, d(width + 1) do
+		for j = 1, d(width) + 1 do
 			row[j] = false
 		end
 		schem[i] = row
@@ -98,7 +98,7 @@ function we_maze.algorithm.wilsons(width, depth)
 		for i = 1, depth do
 			path[i] = {}
 		end
-		while not schem[d(el[1]) + 1][d(el[2]) + 1] do
+		while not schem[d(el[1])][d(el[2])] do
 			local dirs = get_valid_dirs(el)
 			local dir = dirs[random(#dirs)]
 			path[el[1]][el[2]] = dir
@@ -108,13 +108,13 @@ function we_maze.algorithm.wilsons(width, depth)
 	end
 
 	local el = remove_random_remaining()
-	schem[d(el[1]) + 1][d(el[2]) + 1] = true
+	schem[d(el[1])][d(el[2])] = true
 	while #remaining > 0 do
 		el = remove_random_remaining()
 		local path = find_path_to_maze(el)
 		local dir = path[el[1]][el[2]]
 		while dir do
-			schem[d(el[1]) + 1][d(el[2]) + 1] = true
+			schem[d(el[1])][d(el[2])] = true
 			remove(el)
 			local wall_el = schem_offset(el, dir)
 			schem[wall_el[1] + 1][wall_el[2] + 1] = true
