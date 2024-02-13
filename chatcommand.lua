@@ -4,7 +4,7 @@ local S = we_maze.S
 worldedit.register_command("maze", {
 	description = S("generate a maze"),
 	params = S(
-		"<wall_node>[,<wall_node,...] [<fill_node=air>, [<path_width=1> [<wall_width=1> [<algorithm=wilsons> [<seed>]]]]]"
+		"<wall_node>[,<wall_node,...] [<fill_node=air> [<path_width=1> [<wall_width=1> [<algorithm=wilsons> [<seed>]]]]]"
 	),
 	privs = { [we_maze.settings.priv] = true },
 	require_pos = 2,
