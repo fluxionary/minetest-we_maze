@@ -8,6 +8,7 @@ function we_maze.chooser.newest(cells)
 	return #cells
 end
 
+-- https://weblog.jamisbuck.org/2011/1/27/maze-generation-growing-tree-algorithm.html
 function we_maze.algorithm.growing_tree(width, depth, chooser)
 	if not chooser then
 		return {}

@@ -64,7 +64,7 @@ worldedit.register_command("maze", {
 		algorithm, rest = unpack(rest:split("%s+", false, 1, true))
 		if algorithm then
 			if not we_maze.algorithm[algorithm] then
-				return false, S("unknown algorithm @1", algorithm)
+				return false, S("unknown algorithm @1. supported are wilsons, backtrack, and prims", algorithm)
 			end
 		else
 			algorithm = "wilsons"
