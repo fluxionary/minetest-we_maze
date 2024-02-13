@@ -2,13 +2,13 @@
 
 a command to create a 2D maze using worldedit.
 
-uses wilson's algorithm.
+you can specify material(s), path width, wall width, algorithm, and a seed.
 
-you can specify material(s), path width, wall width, and a seed.
+currently only wilson's algorithm is implemented.
 
 e.g.
 ```
-//maze default:stone,default:cobble air 3 2 7717
+//maze default:stone,default:cobble air 3 2 wilsons 7717
 ```
 
 makes a maze where the nodes in the walls are randomly cobble or stone, the passsages are air, the width of a path is

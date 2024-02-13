@@ -3,7 +3,9 @@ local S = we_maze.S
 
 worldedit.register_command("maze", {
 	description = S("generate a maze"),
-	params = S("<wall_node>[,<wall_node,...] [<fill_node=air>, [<path_width=1> [<wall_width=1> [<seed>]]]]"),
+	params = S(
+		"<wall_node>[,<wall_node,...] [<fill_node=air>, [<path_width=1> [<wall_width=1> [<algorithm=wilsons> [<seed>]]]]]"
+	),
 	privs = { [we_maze.settings.priv] = true },
 	require_pos = 2,
 	parse = function(param)
@@ -25,7 +27,7 @@ worldedit.register_command("maze", {
 			wall_nodes[i] = actual_node
 		end
 		rest = rest or ""
-		local fill_node, path_width, wall_width, seed
+		local fill_node, path_width, wall_width, algorithm, seed
 		fill_node, rest = unpack(rest:split("%s+", false, 1, true))
 		if fill_node then
 			local actual_fill_node = worldedit.normalize_nodename(fill_node)
@@ -58,15 +60,24 @@ worldedit.register_command("maze", {
 		else
 			wall_width = 1
 		end
+		rest = rest or ""
+		algorithm, rest = unpack(rest:split("%s+", false, 1, true))
+		if algorithm then
+			if not we_maze.algorithm[algorithm] then
+				return false, S("unknown algorithm @1", algorithm)
+			end
+		else
+			algorithm = "wilsons"
+		end
 		if rest then
 			seed = tonumber(rest)
 			if not seed then
 				return false, S("seed must be a number")
 			end
 		end
-		return true, wall_nodes, fill_node, path_width, wall_width, seed
+		return true, wall_nodes, fill_node, path_width, wall_width, algorithm, seed
 	end,
-	func = function(name, wall_nodes, fill_node, path_width, wall_width, seed)
+	func = function(name, wall_nodes, fill_node, path_width, wall_width, algorithm, seed)
 		local dx = math.abs(worldedit.pos1[name].x - worldedit.pos2[name].x) + 1
 		local dz = math.abs(worldedit.pos1[name].z - worldedit.pos2[name].z) + 1
 
@@ -79,7 +90,7 @@ worldedit.register_command("maze", {
 
 		minetest.log("action", f("%s invoked //maze @%s-%s", name, worldedit.pos1[name], worldedit.pos2[name]))
 		local start = minetest.get_us_time()
-		we_maze.generate(name, wall_nodes, fill_node, path_width, wall_width, seed)
+		we_maze.generate(name, wall_nodes, fill_node, path_width, wall_width, algorithm, seed)
 		return true, S("maze generated in @1s", f("%.03f", (minetest.get_us_time() - start) / 1e6))
 	end,
 })
