@@ -13,16 +13,60 @@ makes a maze where the nodes in the walls are randomly cobble or stone, the pass
 3, the width of the walls is 2, and 7717 is a seed (to generate the same maze consistently). note that if a seed is
 provided, the maze will only be identical if the x/z size is identical.
 
+note that mazes lack floors or ceilings, or entrances or exits. those can be added via other worldedit commands.
+
 supported algorithms:
 
-* wilsons
+* wilsons (default)
 
   this produces the most balanced mazes - all possible mazes are equally likely
+
+  ```
+  █████████████████████
+  █           █       █
+  █ █████ ███ ███ ███ █
+  █   █ █   █     █   █
+  █████ █████ ███ █ █ █
+  █       █     █ █ █ █
+  █ ███████ █████████ █
+  █   █         █     █
+  █ ███ █ ███████ ███ █
+  █     █       █   █ █
+  █████████████████████
+  ```
 
 * backtrack
 
   this tends to produce mazes with long paths and few dead ends
 
+  ```
+  █████████████████████
+  █   █   █         █ █
+  █ █ █ █ ███ █ ███ █ █
+  █ █   █   █ █   █   █
+  █ ███████ █ ███ █████
+  █   █   █ █   █     █
+  █ █ █ ███ █████ ███ █
+  █ █ █     █   █ █   █
+  █ █ ███ ███ █ ███ █ █
+  █ █   █     █     █ █
+  █████████████████████
+  ```
+
 * prims
 
   this tends to produce mazes with short paths and lots of dead ends
+
+  ```
+  █████████████████████
+  █             █     █
+  ███████ █████ ███ ███
+  █   █   █           █
+  ███ ███████████ █ ███
+  █   █ █         █   █
+  ███ █ ███ █████ █ ███
+  █       █ █     █   █
+  ███ ███ █ ███ ███ ███
+  █   █     █   █     █
+  █████████████████████
+  ```
