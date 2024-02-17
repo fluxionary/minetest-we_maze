@@ -9,7 +9,7 @@ end
 worldedit.register_command("maze", {
 	description = S("generate a maze"),
 	params = S(
-		"<wall_node>[,<wall_node,...] [<fill_node=air> [<path_width=1> [<wall_width=1> [<algorithm=@1> [<seed>]]]]]",
+		"<wall_node>[,<wall_node,...] [<fill_node=air> [<path_width=1> [<wall_width=1> [<algorithm=@1|random> [<seed>]]]]]",
 		table.concat(algorithms, "|")
 	),
 	privs = { [we_maze.settings.priv] = true },
@@ -73,8 +73,11 @@ worldedit.register_command("maze", {
 		rest = rest or ""
 		algorithm, rest = unpack(rest:split("%s+", false, 1, true))
 		if algorithm then
-			if not we_maze.algorithm[algorithm] then
-				return false, S("unknown algorithm @1. supported are @2", algorithm, table.concat(algorithms, ", "))
+			if algorithm == "random" then
+				algorithm = algorithms[math.random(#algorithms)]
+			elseif not we_maze.algorithm[algorithm] then
+				return false,
+					S("unknown algorithm @1. supported are @2, or random", algorithm, table.concat(algorithms, ", "))
 			end
 		else
 			algorithm = "wilsons"

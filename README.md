@@ -73,3 +73,7 @@ supported algorithms:
   █   █     █   █     █
   █████████████████████
   ```
+
+* random
+
+  this will randomly choose one of the above algorithms.
