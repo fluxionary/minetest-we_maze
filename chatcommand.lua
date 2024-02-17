@@ -1,10 +1,16 @@
 local f = string.format
 local S = we_maze.S
 
+local algorithms = {}
+for algorithm in futil.table.pairs_by_key(we_maze.algorithm) do
+	algorithms[#algorithms + 1] = algorithm
+end
+
 worldedit.register_command("maze", {
 	description = S("generate a maze"),
 	params = S(
-		"<wall_node>[,<wall_node,...] [<fill_node=air> [<path_width=1> [<wall_width=1> [<algorithm=wilsons> [<seed>]]]]]"
+		"<wall_node>[,<wall_node,...] [<fill_node=air> [<path_width=1> [<wall_width=1> [<algorithm=@1> [<seed>]]]]]",
+		table.concat(algorithms, "|")
 	),
 	privs = { [we_maze.settings.priv] = true },
 	require_pos = 2,
@@ -22,7 +28,7 @@ worldedit.register_command("maze", {
 			local node = nodes[i]
 			local actual_node = worldedit.normalize_nodename(node)
 			if not actual_node then
-				return false, S("invalid node name: @1", node)
+				return false, S("invalid node name for wall: @1", node)
 			end
 			wall_nodes[i] = actual_node
 		end
@@ -30,9 +36,13 @@ worldedit.register_command("maze", {
 		local fill_node, path_width, wall_width, algorithm, seed
 		fill_node, rest = unpack(rest:split("%s+", false, 1, true))
 		if fill_node then
+			if tonumber(fill_node) then
+				-- e.g. wielded_light has nodes named 1, 2, 3 etc. but this is more likely a mistake
+				return false, S("invalid node name for fill: @1", fill_node)
+			end
 			local actual_fill_node = worldedit.normalize_nodename(fill_node)
 			if not actual_fill_node then
-				return false, S("invalid node name: @1", fill_node)
+				return false, S("invalid node name for fill: @1", fill_node)
 			end
 			fill_node = actual_fill_node
 		else
@@ -64,7 +74,7 @@ worldedit.register_command("maze", {
 		algorithm, rest = unpack(rest:split("%s+", false, 1, true))
 		if algorithm then
 			if not we_maze.algorithm[algorithm] then
-				return false, S("unknown algorithm @1. supported are wilsons, backtrack, and prims", algorithm)
+				return false, S("unknown algorithm @1. supported are @2", algorithm, table.concat(algorithms, ", "))
 			end
 		else
 			algorithm = "wilsons"

@@ -1,15 +1,7 @@
 local random = math.random
 
-we_maze.chooser = {}
-function we_maze.chooser.random(cells)
-	return random(#cells)
-end
-function we_maze.chooser.newest(cells)
-	return #cells
-end
-
 -- https://weblog.jamisbuck.org/2011/1/27/maze-generation-growing-tree-algorithm.html
-function we_maze.algorithm.growing_tree(width, depth, chooser)
+local function growing_tree(width, depth, chooser)
 	if not chooser then
 		return {}
 	end
@@ -76,10 +68,18 @@ function we_maze.algorithm.growing_tree(width, depth, chooser)
 	return schem
 end
 
+we_maze.chooser = {}
+function we_maze.chooser.random(cells)
+	return random(#cells)
+end
+function we_maze.chooser.newest(cells)
+	return #cells
+end
+
 function we_maze.algorithm.backtrack(width, depth)
-	return we_maze.algorithm.growing_tree(width, depth, we_maze.chooser.newest)
+	return growing_tree(width, depth, we_maze.chooser.newest)
 end
 
 function we_maze.algorithm.prims(width, depth)
-	return we_maze.algorithm.growing_tree(width, depth, we_maze.chooser.random)
+	return growing_tree(width, depth, we_maze.chooser.random)
 end
