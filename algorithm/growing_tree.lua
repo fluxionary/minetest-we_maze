@@ -5,67 +5,53 @@ local function growing_tree(width, depth, chooser)
 	if not chooser then
 		return {}
 	end
-	local schem = {}
-	-- schem[min/max][*] and schem[*][min/max] are outer walls
-	-- schem[even][even] will all be part of a path
-	-- schem[odd][odd] will all be part of a wall
-	-- schem[odd][even] and schem[even][odd] may be either a wall or a path
-	-- (width=5, depth=3) will look something like
-	--[[
-	 12345678901
-	1###########
-	2#   #     #
-	3# # # # ###
-	4# #   # # #
-	5# # ### # #
-	6# #   #   #
-	7###########
-	 12345678901
-	]]
-	for i = 1, 2 * depth + 1 do
-		local row = {}
-		for j = 1, 2 * width + 1 do
-			row[j] = false
-		end
-		schem[i] = row
+
+	local function to_vertex(i, j)
+		return (i - 1) * width + j
 	end
 
-	local function get_unvisited_neighbors(cell)
+	local maze = futil.SparseGraph(width * depth)
+	local visited = futil.Set()
+
+	local function get_unvisited_neighbors(i, j)
 		local neighbors = {}
-		if cell[1] ~= 2 and not schem[cell[1] - 2][cell[2]] then
-			neighbors[#neighbors + 1] = { cell[1] - 2, cell[2], cell[1] - 1, cell[2] }
+		if i ~= 1 and not visited:contains(to_vertex(i - 1, j)) then
+			neighbors[#neighbors + 1] = { i - 1, j }
 		end
-		if cell[1] ~= 2 * depth and not schem[cell[1] + 2][cell[2]] then
-			neighbors[#neighbors + 1] = { cell[1] + 2, cell[2], cell[1] + 1, cell[2] }
+		if i ~= depth and not visited:contains(to_vertex(i + 1, j)) then
+			neighbors[#neighbors + 1] = { i + 1, j }
 		end
-		if cell[2] ~= 2 and not schem[cell[1]][cell[2] - 2] then
-			neighbors[#neighbors + 1] = { cell[1], cell[2] - 2, cell[1], cell[2] - 1 }
+		if j ~= 1 and not visited:contains(to_vertex(i, j - 1)) then
+			neighbors[#neighbors + 1] = { i, j - 1 }
 		end
-		if cell[2] ~= 2 * width and not schem[cell[1]][cell[2] + 2] then
-			neighbors[#neighbors + 1] = { cell[1], cell[2] + 2, cell[1], cell[2] + 1 }
+		if j ~= width and not visited:contains(to_vertex(i, j + 1)) then
+			neighbors[#neighbors + 1] = { i, j + 1 }
 		end
 		return neighbors
 	end
 
-	local cell = { 2 * random(depth), 2 * random(width) }
-	schem[cell[1]][cell[2]] = true
-	local cells = { cell }
+	local cell = { random(depth), random(width) }
+	visited:add(to_vertex(unpack(cell)))
+	local fringe_cells = { cell }
 
-	while #cells > 0 do
-		local i = chooser(cells)
-		cell = cells[i]
-		local neighbors = get_unvisited_neighbors(cell)
+	while #fringe_cells > 0 do
+		local cell_i = chooser(fringe_cells)
+		cell = fringe_cells[cell_i]
+		local neighbors = get_unvisited_neighbors(unpack(cell))
 		if #neighbors == 0 then
-			table.remove(cells, i)
+			table.remove(fringe_cells, cell_i) -- TODO: expensive (O(n))
 		else
 			local neighbor = neighbors[random(#neighbors)]
-			schem[neighbor[1]][neighbor[2]] = true
-			schem[neighbor[3]][neighbor[4]] = true
-			cells[#cells + 1] = { neighbor[1], neighbor[2] }
+			local neighbor_v = to_vertex(unpack(neighbor))
+			local cell_v = to_vertex(unpack(cell))
+			visited:add(neighbor_v)
+			maze:add_edge(cell_v, neighbor_v)
+			maze:add_edge(neighbor_v, cell_v)
+			fringe_cells[#fringe_cells + 1] = neighbor
 		end
 	end
 
-	return schem
+	return maze
 end
 
 we_maze.chooser = {}
